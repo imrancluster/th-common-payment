@@ -17,9 +17,11 @@ func main() {
 
 	// initate front page controller
 	frontController := controllers.NewFrontController()
+	adminController := controllers.NewAdminController()
 
 	// all routers
 	route.GET("/", frontController.HomePage)
+	route.GET("/admin", adminController.Index)
 
 	// start server
 	http.ListenAndServe("localhost:8080", route)
