@@ -1,11 +1,17 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+	"text/template"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*"))
+}
 
 // FrontController
 type FrontController struct{}
@@ -19,5 +25,6 @@ func NewFrontController() *FrontController {
 func (frontController FrontController) HomePage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	w.WriteHeader(http.StatusOK) // 200
-	fmt.Fprintf(w, "%s\n", "Welcome to Home page")
+
+	tpl.ExecuteTemplate(w, "index.html", nil)
 }
