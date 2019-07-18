@@ -7,18 +7,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-var tpl *template.Template
-
-func init() {
-	tpl = template.Must(template.ParseGlob("templates/*"))
+// FrontController
+type FrontController struct {
+	tpl *template.Template
 }
 
-// FrontController
-type FrontController struct{}
-
 // NewFrontController: Constructor of FrontController
-func NewFrontController() *FrontController {
-	return &FrontController{}
+func NewFrontController(t *template.Template) *FrontController {
+	return &FrontController{t}
 }
 
 // Methods have to be capitalized to be exported, eg,
@@ -26,5 +22,5 @@ func (frontController FrontController) HomePage(w http.ResponseWriter, r *http.R
 
 	w.WriteHeader(http.StatusOK) // 200
 
-	tpl.ExecuteTemplate(w, "index.html", nil)
+	frontController.tpl.ExecuteTemplate(w, "index.html", nil)
 }

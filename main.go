@@ -4,11 +4,18 @@ package main
 
 // Need to add personal git package here, like controllers, models etc
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/imrancluster/th-common-payment/controllers"
 	"github.com/julienschmidt/httprouter"
 )
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*"))
+}
 
 func main() {
 
@@ -16,8 +23,8 @@ func main() {
 	route := httprouter.New()
 
 	// initate front page controller
-	frontController := controllers.NewFrontController()
-	adminController := controllers.NewAdminController()
+	frontController := controllers.NewFrontController(tpl)
+	adminController := controllers.NewAdminController(tpl)
 
 	// all routers
 	route.GET("/", frontController.HomePage)
