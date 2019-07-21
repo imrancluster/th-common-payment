@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/imrancluster/th-common-payment/controllers"
+	"github.com/GoesToEleven/golang-web-dev/046_mongodb/15_postgres/config"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -22,15 +22,15 @@ func main() {
 	// initiate httprouter
 	route := httprouter.New()
 
-	// initate front page controller
-	frontController := controllers.NewFrontController(tpl)
-	adminController := controllers.NewAdminController(tpl)
-
-	// all routers
-	route.GET("/", frontController.HomePage)
+	// all routes
+	route.GET("/", index)
 	route.GET("/admin", adminController.Index)
 
 	// start server
 	http.ListenAndServe("localhost:8080", route)
 
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	config.TPL.ExecuteTemplate(w, "index.html", nil)
 }
