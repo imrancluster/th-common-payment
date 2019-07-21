@@ -4,19 +4,13 @@ package main
 
 // Need to add personal git package here, like controllers, models etc
 import (
-	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/imrancluster/th-common-payment/admin"
 	"github.com/imrancluster/th-common-payment/config"
 	"github.com/julienschmidt/httprouter"
 )
-
-var tpl *template.Template
-
-func init() {
-	tpl = template.Must(template.ParseGlob("templates/*"))
-}
 
 func main() {
 
@@ -32,6 +26,7 @@ func main() {
 
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
-	config.TPL.ExecuteTemplate(w, "index.html", nil)
+func index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	log.Println("Index page")
+	config.TPL.ExecuteTemplate(w, "index.gohtml", nil)
 }

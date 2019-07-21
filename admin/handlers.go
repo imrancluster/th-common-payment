@@ -9,5 +9,5 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	config.TPL.ExecuteTemplate(w, "index.html", nil)
+	config.TPL.ExecuteTemplate(w, "admin-index.gohtml", nil)
 }
