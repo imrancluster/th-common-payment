@@ -7,7 +7,8 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/GoesToEleven/golang-web-dev/046_mongodb/15_postgres/config"
+	"github.com/imrancluster/th-common-payment/admin"
+	"github.com/imrancluster/th-common-payment/config"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -24,7 +25,7 @@ func main() {
 
 	// all routes
 	route.GET("/", index)
-	route.GET("/admin", adminController.Index)
+	route.GET("/admin", admin.Index)
 
 	// start server
 	http.ListenAndServe("localhost:8080", route)
