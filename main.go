@@ -3,12 +3,13 @@
 package main
 
 // Need to add personal git package here, like controllers, models etc
+// "github.com/imrancluster/th-common-payment/config"
+// "github.com/imrancluster/th-common-payment/admin"
 import (
-	"log"
 	"net/http"
 
-	"github.com/imrancluster/th-common-payment/admin"
-	"github.com/imrancluster/th-common-payment/config"
+	"./admin"
+	"./config"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -27,6 +28,10 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	log.Println("Index page")
+
+	config.CLog("VISIT_INDEX_PAGE", "01799997163", map[string]interface{}{"data1": "test1", "data2": "test2"}).Info("Visit Index Page")
+	config.CLog("INDEX_WARNING", "01799997163", map[string]interface{}{"data1": "t1", "data2": "t2"}).Warning("Index warning")
+	config.CLog("INDEX_ERROR", "01799997163", map[string]interface{}{"data1": "t1", "data2": "t2"}).Error("Index Error")
+
 	config.TPL.ExecuteTemplate(w, "index.gohtml", nil)
 }

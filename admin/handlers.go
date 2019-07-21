@@ -3,7 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"github.com/imrancluster/th-common-payment/config"
+	"../config"
 	"github.com/julienschmidt/httprouter"
 )
 
