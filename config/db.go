@@ -1,24 +1,32 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
-
-	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 )
 
-var DB *sql.DB
+// Database struct for connection
+type Database struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	Name     string
+}
 
-func init() {
-	var err error
-	DB, err = sql.Open("postgres", "postgres://th_common_payment:thc0mm0np@yment@localhost/th_common_payment?sslmode=disable")
-	if err != nil {
-		panic(err)
+var db Database
+
+// DB function for database keys
+func DB() Database {
+	return db
+}
+
+// LoadDB read the config
+func LoadDB() {
+	db = Database{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetInt("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: viper.GetString("db.password"),
+		Name:     viper.GetString("db.name"),
 	}
-
-	if err = DB.Ping(); err != nil {
-		panic(err)
-	}
-
-	fmt.Println("You connected to your database.")
 }
