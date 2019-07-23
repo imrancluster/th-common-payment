@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
-	"./admin"
-	"./config"
+	"github.com/imrancluster/th-common-payment/admin"
+	"github.com/imrancluster/th-common-payment/config"
 	"github.com/julienschmidt/httprouter"
 )
 

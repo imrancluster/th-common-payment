@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"../config"
+	"github.com/imrancluster/th-common-payment/config"
 )
 
 type User struct {
