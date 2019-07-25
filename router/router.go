@@ -29,8 +29,13 @@ func Router() *chi.Mux {
 
 	router.Handle("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir("public"))))
 
+	// Routes for Web
 	router.Get("/", SystemRoot)
-	router.Route("/v1", func(r chi.Router) {
+	router.Route("/", func(r chi.Router) {
+		r.Mount("/user", userWebRoutes())
+	})
+
+	router.Route("/api/v1", func(r chi.Router) {
 		r.Mount("/users", userRoutes())
 	})
 
