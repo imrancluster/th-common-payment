@@ -1,11 +1,13 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/imrancluster/th-common-payment/config"
+	"github.com/imrancluster/th-common-payment/handlers/web"
 )
 
 var router *chi.Mux
@@ -21,7 +23,12 @@ func init() {
 // SystemRoot handller
 func SystemRoot(w http.ResponseWriter, r *http.Request) {
 
-	config.TPL.ExecuteTemplate(w, "index.gohtml", nil)
+	type UserInfo struct{ Username string }
+	userInfo := UserInfo{Username: web.GetUserName(r)}
+
+	fmt.Println("Username from session: ", userInfo.Username)
+
+	config.TPL.ExecuteTemplate(w, "index.gohtml", userInfo)
 }
 
 // Router defines all routers

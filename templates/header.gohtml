@@ -21,15 +21,24 @@
     <div class="row">
       <div class="eight columns" style="margin-top: 2%">
         <a class="button" href="/">Home</a>
-        <a class="button" href="#">Applications</a>
-        <a class="button" href="#">Clients</a>
-        <a class="button" href="#">Payment Methods</a>
-        <a class="button" href="#">Settings</a>
+        {{if .Username}}
+          <a class="button" href="#">Applications</a>
+          <a class="button" href="#">Clients</a>
+          <a class="button" href="#">Payment Methods</a>
+          <a class="button" href="#">Settings</a>
+        {{end}}
       </div>
 
       <div class="four columns" style="margin-top: 2%">
-        <a class="button" href="/user/signin">Sign In</a>
-        <a class="button" href="/user/signup">Sign Up</a>
+        {{if .Username}}
+          <a class="button" href="/user/profile">Profile</a> 
+          <form action="/user/signout" method="POST">
+            <button type="submit" class="button" href="/user/signout">Sign Out</button>
+          </form>
+        {{else}}  
+          <a class="button" href="/user/signin">Sign In</a>
+          <a class="button" href="/user/signup">Sign Up</a>
+        {{end}}
       </div>
     </div>
 </div>

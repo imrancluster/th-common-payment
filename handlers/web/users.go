@@ -1,23 +1,53 @@
-package handlers
+package web
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
-	"github.com/go-chi/chi"
+	"github.com/gorilla/securecookie"
 	"github.com/imrancluster/th-common-payment/config"
 	"github.com/imrancluster/th-common-payment/conn"
 	"github.com/imrancluster/th-common-payment/models"
-	"github.com/imrancluster/th-common-payment/repository"
-	userRepoImpl "github.com/imrancluster/th-common-payment/repository/user"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// UserAPI ..
-type UserAPI struct {
-	repo repository.UserRepo
+// cookie handling
+var cookieHandler = securecookie.New(
+	securecookie.GenerateRandomKey(64),
+	securecookie.GenerateRandomKey(32))
+
+func GetUserName(request *http.Request) (userName string) {
+	if cookie, err := request.Cookie("session"); err == nil {
+		cookieValue := make(map[string]string)
+		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+			userName = cookieValue["name"]
+		}
+	}
+	return userName
+}
+
+func setSession(userName string, response http.ResponseWriter) {
+	value := map[string]string{
+		"name": userName,
+	}
+	if encoded, err := cookieHandler.Encode("session", value); err == nil {
+		cookie := &http.Cookie{
+			Name:  "session",
+			Value: encoded,
+			Path:  "/",
+		}
+		http.SetCookie(response, cookie)
+	}
+}
+
+func clearSession(response http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(response, cookie)
 }
 
 type UserWeb struct{}
@@ -26,55 +56,6 @@ type userData struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-// CreateUser ..
-func (u *UserAPI) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user userData
-
-	body := json.NewDecoder(r.Body)
-	if err := body.Decode(&user); err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	passHash, errHash := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if errHash != nil {
-		respondWithError(w, http.StatusBadRequest, errHash.Error())
-		return
-	}
-
-	readerUser := models.User{
-		Username: user.Username,
-		Email:    user.Email,
-		Password: string(passHash),
-	}
-
-	payload, errCrUser := u.repo.CreateUser(r.Context(), &readerUser)
-	if errCrUser != nil {
-		respondWithError(w, http.StatusConflict, errCrUser.Error())
-		return
-	}
-
-	respondwithJSON(w, http.StatusCreated, payload)
-}
-
-// GetUser ..
-func (u *UserAPI) GetUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "user_id"))
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	getUser, errGet := u.repo.GetUser(r.Context(), id)
-
-	if errGet != nil {
-		respondWithError(w, http.StatusNotFound, fmt.Sprintf("%s", errGet))
-		return
-	}
-
-	respondwithJSON(w, http.StatusOK, getUser)
 }
 
 // SignUp ..
@@ -93,7 +74,7 @@ func (u *UserWeb) SignUpProcess(w http.ResponseWriter, r *http.Request) {
 
 	passHash, errHash := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if errHash != nil {
-		respondWithError(w, http.StatusBadRequest, errHash.Error())
+		http.Error(w, errHash.Error(), http.StatusForbidden)
 		return
 	}
 
@@ -138,14 +119,24 @@ func (u *UserWeb) SignInProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// .. check credentials ..
+	setSession(user.Username, w)
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// NewUserAPI ..
-func NewUserAPI() *UserAPI {
-	return &UserAPI{
-		repo: userRepoImpl.NewUser(),
-	}
+// SignOut ..
+func (u *UserWeb) SignOut(w http.ResponseWriter, r *http.Request) {
+	clearSession(w)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (u *UserWeb) Profile(w http.ResponseWriter, r *http.Request) {
+
+	type UserInfo struct{ Username string }
+	userInfo := UserInfo{Username: GetUserName(r)}
+
+	config.TPL.ExecuteTemplate(w, "profile.gohtml", userInfo)
 }
 
 // NewWebUser ..
