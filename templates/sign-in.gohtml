@@ -1,11 +1,18 @@
 {{ template "header" }}
-
+  
   <div class="container">
     <div class="row">
       <div class="one-half column" style="margin-top: 5%">
         <h4>Sign In</h4>
 
         <form action="/user/signin/process" method="POST">
+            <div class="row">
+              <div class="twelve columns">
+                {{ with .Errors.Login }}
+                  <p class="error">{{ . }}</p>
+                {{ end }}
+              </div>
+            </div>
             <div class="row">
               <div class="twelve columns">
                 <label for="username">Userename</label>

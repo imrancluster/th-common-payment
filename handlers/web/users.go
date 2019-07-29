@@ -3,7 +3,9 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/securecookie"
 	"github.com/imrancluster/th-common-payment/config"
@@ -93,6 +95,29 @@ func (u *UserWeb) SignUp(w http.ResponseWriter, r *http.Request) {
 // SignUpProcess ..
 func (u *UserWeb) SignUpProcess(w http.ResponseWriter, r *http.Request) {
 	var user userData
+	var msg Message
+	msg.Errors = make(map[string]string)
+
+	re := regexp.MustCompile(".+@.+\\..+")
+	matched := re.Match([]byte(r.FormValue("email")))
+	if matched == false {
+		msg.Errors["Email"] = "Please enter a valid email address"
+	}
+
+	if strings.TrimSpace(r.FormValue("username")) == "" {
+		msg.Errors["Username"] = "Username should not empty"
+	}
+
+	if len(strings.TrimSpace(r.FormValue("password"))) < 6 {
+		msg.Errors["Password"] = "Password should be minimum 6 digit"
+	}
+
+	if len(msg.Errors) != 0 {
+		msg.Errors["EmailValue"] = r.FormValue("email")
+		msg.Errors["UsernameValue"] = r.FormValue("username")
+		config.TPL.ExecuteTemplate(w, "sign-up.gohtml", msg)
+		return
+	}
 
 	user.Username = r.FormValue("username")
 	user.Password = r.FormValue("password")
@@ -119,7 +144,7 @@ func (u *UserWeb) SignUpProcess(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// SignIn
+// SignIn ..
 func (u *UserWeb) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	config.TPL.ExecuteTemplate(w, "sign-in.gohtml", nil)
@@ -128,21 +153,24 @@ func (u *UserWeb) SignIn(w http.ResponseWriter, r *http.Request) {
 // SignInProcess ..
 func (u *UserWeb) SignInProcess(w http.ResponseWriter, r *http.Request) {
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	var msg Message
+	msg.Errors = make(map[string]string)
 
 	var user models.User
 	db := conn.PostgresDB()
 
-	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
-		http.Error(w, "Username and/or password do not match", http.StatusForbidden)
-		return
+	if err := db.Where("username = ?", r.FormValue("username")).First(&user).Error; err != nil {
+		msg.Errors["Login"] = "Username and/or password do not match"
 	}
 
 	// does the entered password match the stored password?
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(r.FormValue("password")))
 	if err != nil {
-		http.Error(w, "Username and/or password do not match", http.StatusForbidden)
+		msg.Errors["Login"] = "Username and/or password do not match"
+	}
+
+	if len(msg.Errors) != 0 {
+		config.TPL.ExecuteTemplate(w, "sign-in.gohtml", msg)
 		return
 	}
 

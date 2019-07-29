@@ -8,16 +8,25 @@
         <form action="/user/signup/process" method="POST">
             <div class="row">
               <div class="twelve columns">
+                {{ with .Errors.Username }}
+                  <p class="error">{{ . }}</p>
+                {{ end }}
                 <label for="username">Userename</label>
-                <input class="u-full-width" type="text" name="username" placeholder="Username" id="username">
+                <input class="u-full-width" type="text" name="username" value="{{.Errors.UsernameValue}}" placeholder="Username" id="username">
               </div>
 
               <div class="twelve columns">
+                {{ with .Errors.Email }}
+                  <p class="error">{{ . }}</p>
+                {{ end }}
                 <label for="email">Your email</label>
-                <input class="u-full-width" type="text" name="email" placeholder="name@exmaple.com" id="email">
+                <input class="u-full-width" type="text" name="email" value="{{.Errors.EmailValue}}" placeholder="name@exmaple.com" id="email">
               </div>
 
               <div class="twelve columns">
+                {{ with .Errors.Password }}
+                  <p class="error">{{ . }}</p>
+                {{ end }}
                 <label for="password">Password</label>
                 <input class="u-full-width" type="password" name="password" placeholder="Password" id="password">
               </div>
