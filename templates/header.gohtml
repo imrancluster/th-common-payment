@@ -22,9 +22,9 @@
       <div class="eight columns" style="margin-top: 2%">
         <a class="button" href="/">Home</a>
         {{if .Username}}
-          <a class="button" href="#">Applications</a>
+          <a class="button" href="#">Apps</a>
           <a class="button" href="#">Clients</a>
-          <a class="button" href="#">Payment Methods</a>
+          <a class="button" href="#">Payments</a>
           <a class="button" href="#">Settings</a>
         {{end}}
       </div>
@@ -32,7 +32,7 @@
       <div class="four columns" style="margin-top: 2%">
         {{if .Username}}
           <a class="button" href="/user/profile">Profile</a> 
-          <form action="/user/signout" method="POST">
+          <form action="/user/signout" method="POST" style="display: inline-block;">
             <button type="submit" class="button" href="/user/signout">Sign Out</button>
           </form>
         {{else}}  

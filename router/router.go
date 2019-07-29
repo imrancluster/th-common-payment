@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -23,10 +22,7 @@ func init() {
 // SystemRoot handller
 func SystemRoot(w http.ResponseWriter, r *http.Request) {
 
-	type UserInfo struct{ Username string }
-	userInfo := UserInfo{Username: web.GetUserName(r)}
-
-	fmt.Println("Username from session: ", userInfo.Username)
+	userInfo := web.GetUserInfoFromSession(r)
 
 	config.TPL.ExecuteTemplate(w, "index.gohtml", userInfo)
 }
@@ -35,6 +31,7 @@ func SystemRoot(w http.ResponseWriter, r *http.Request) {
 func Router() *chi.Mux {
 
 	router.Handle("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir("public"))))
+	router.Handle("/favicon.ico", http.NotFoundHandler())
 
 	// Routes for Web
 	router.Get("/", SystemRoot)
